@@ -1,6 +1,4 @@
-Graph in haskell
-this is an exercise to implement a graph structure in haskell.
-My goal is to optimize it for better efficiency (without change the defined graph type if it is possible).
+Grafo in haskell
 
-Sorry for the italian language inside the code, i'll change function names and comments soon.
+chiunque voglia contribuire a migliorarne ed arricchirne  le funzioni, senza alterare il tipo definito, e' il benvenuto
 
