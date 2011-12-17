@@ -1,7 +1,5 @@
 {-
    *******************************************
-   *  Fondamenti dell'informatica 2011       *
-   *  Marco Di Pietro - Mat. 477442          *
    *                                         *
    *             Struttura Grafo             *
    *  funzione iniziale: main                *
