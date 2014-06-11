@@ -1,28 +1,27 @@
 {-
    *******************************************
    *                                         *
-   *             Struttura Grafo             *
-   *  funzione iniziale: main                *
-   *                                         *
-   * oppure: inputGrafo <grafo>              *
-   * per passare un grafo come argomento     *
+   *        Graph data type structure        *
+   *  		                                 *
+   * main function: main                     *
+   * or: inputGraph <graph>                  *
    *******************************************
 
-Grafo: coppia di liste, la prima di nodi, la seconda di archi
-Nodo: coppia vertice-elemento
-Arco: coppia vertice-vertice
-Vertice: valore di tipo Int >=0
+Graph: pair of lists composed by the nodes list and the edges list
+Node: vertex-element pair
+Edge: vertex-vertex pair
+Vertex: Int value >=0
 
-L'elemento contenuto in un nodo e' una stringa.
+The element inside each node is a string.
 
-Il tipo di dato contenuto nel nodo si puo' modificare agendo su "type Elemento = ...". 
-Il tipo di dato contenuto nel nodo deve essere in una lista ([Int], String o [Char] ecc...)
-Se viene modificato il tipo e' necessario modificare le funzioni di acquisizione da stdin
+You can modify the type modifying "type Element = ...". 
+The data type in a node must be a list ([Int], String or [Char] etc...)
+If you modify the type, please modify also the stdin functions
 
-esempio utilizzo: 
+usage example: 
 > main 
-oppure
-> inputGrafo ([(0,"test"),(4,"prova"),(2,""),(6,"")],[(4,0),(2,6),(0,6),(2,2),(6,4),(4,2)])
+or
+> inputGraph ([(0,"test1"),(4,"test2"),(2,""),(6,"")],[(4,0),(2,6),(0,6),(2,2),(6,4),(4,2)])
 
 -}
 
@@ -31,19 +30,19 @@ import System.IO
 
 -- TIPI --------------------------
 
-type Vertice = Int
-type Elemento = String
-type Arco = (Vertice, Vertice)
-type Nodo = (Vertice, Elemento)
-type Grafo = ([Nodo],[Arco])
+type Vertex = Int
+type Element = String
+type Edge = (Vertex, Vertex)
+type Node = (Vertex, Element)
+type Graph = ([Node],[Edge])
 
 
--- Funzioni per leggere i singoli elementi di un Nodo
-vertice :: Nodo -> Vertice
-vertice n = fst n
+-- Funzioni per leggere i singoli elementi di un Node
+vertex :: Node -> Vertex
+vertex n = fst n
 
-elemento :: Nodo -> Elemento
-elemento n = snd n
+element :: Node -> Element
+element n = snd n
 
 
 -- FUNZIONI DI SUPPORTO ------------------------------
@@ -51,166 +50,166 @@ elemento n = snd n
 --safetail [] = []
 --safetail (_:xs) = xs
 
--- Primo nodo della lista di nodi di un grafo
-primoNodo :: Grafo -> Nodo
-primoNodo   g = head (fst g)
+-- Primo node della list di nodes di un graph
+firstNode :: Graph -> Node
+firstNode   g = head (fst g)
 
--- Lista dei nodi di un grafo successivi al primo
-succNodi :: Grafo -> [Nodo]
-succNodi ([],_) = []
-succNodi  g = tail (fst g)
+-- List dei nodes di un graph successivi al first
+nextNodes :: Graph -> [Node]
+nextNodes ([],_) = []
+nextNodes  g = tail (fst g)
 
--- Lista di tutti i nodi di un grafo
-getNodi :: Grafo -> [Nodo]
-getNodi  ([],_) = []
-getNodi   g = fst g
+-- List di tutti i nodes di un graph
+getNodes :: Graph -> [Node]
+getNodes  ([],_) = []
+getNodes   g = fst g
 
--- Primo arco della lista di archi di un grafo
-primoArco :: Grafo -> Arco
-primoArco g = head (snd g)
+-- Primo arco della list di archi di un graph
+firstEdge :: Graph -> Edge
+firstEdge g = head (snd g)
 
--- Lista degli archi di un grafo successivi al primo
-succArchi :: Grafo -> [Arco]
-succArchi (_,[]) = []
-succArchi g = tail (snd g)
+-- List degli archi di un graph successivi al first
+nextEdges :: Graph -> [Edge]
+nextEdges (_,[]) = []
+nextEdges g = tail (snd g)
 
--- Lista di tutti gli archi di un grafo
-getArchi :: Grafo -> [Arco]
-getArchi (_,[]) = []
-getArchi  g = snd g
+-- List di tutti gli archi di un graph
+getEdges :: Graph -> [Edge]
+getEdges (_,[]) = []
+getEdges  g = snd g
 
--- Trova un nodo nel grafo partendo dal suo vertice
-trovaNodo :: Vertice -> Grafo -> [Nodo]
-trovaNodo _ ([],_) = []
-trovaNodo v g 
-   | v == vertice (primoNodo g) = [primoNodo g]
-   | otherwise = trovaNodo v (succNodi g, [])
+-- Trova un node nel graph partendo dal suo vertex
+findNode :: Vertex -> Graph -> [Node]
+findNode _ ([],_) = []
+findNode v g 
+   | v == vertex (firstNode g) = [firstNode g]
+   | otherwise = findNode v (nextNodes g, [])
 
--- Lista di tutti i vertici di un grafo
-vertici :: Grafo -> [Vertice]
-vertici g = map (vertice) (getNodi g)
+-- List di tutti i vertices di un graph
+vertices :: Graph -> [Vertex]
+vertices g = map (vertex) (getNodes g)
 
--- Converte una lista di vertici in una lista di nodi
-verticiToNodi :: [Vertice] -> Grafo -> [Nodo]
-verticiToNodi [] _ = []
-verticiToNodi (v:vs) g = trovaNodo v g ++ verticiToNodi vs g
+-- Converte una list di vertices in una list di nodes
+verticesToNodes :: [Vertex] -> Graph -> [Node]
+verticesToNodes [] _ = []
+verticesToNodes (v:vs) g = findNode v g ++ verticesToNodes vs g
 
--- Converte una lista di nodi in una lista di vertici
-nodiToVertici :: [Nodo] -> [Vertice]
-nodiToVertici [] = []
-nodiToVertici (v:vs) = (vertice v) : nodiToVertici vs
+-- Converte una list di nodes in una list di vertices
+nodesToVertices :: [Node] -> [Vertex]
+nodesToVertices [] = []
+nodesToVertices (v:vs) = (vertex v) : nodesToVertices vs
 
--- Lista dei vertici adiacenti ad un nodo con vertice v
-listaAdiacenti :: Vertice -> [Arco] -> [Vertice]
-listaAdiacenti v [] = []
-listaAdiacenti v (x:xs)
-   | (fst x)==v = snd x : listaAdiacenti v xs
-   | otherwise = listaAdiacenti v xs
+-- List dei vertices adjacents ad un node con vertex v
+listAdjacents :: Vertex -> [Edge] -> [Vertex]
+listAdjacents v [] = []
+listAdjacents v (x:xs)
+   | (fst x)==v = snd x : listAdjacents v xs
+   | otherwise = listAdjacents v xs
 
--- Lista degli archi in cui il vertice di partenza e' v
-listaArchiAdiacenza :: Vertice -> [Arco] -> [Arco]
-listaArchiAdiacenza v [] = []
-listaArchiAdiacenza v (x:xs)
-   | (fst x)==v  = x : listaArchiAdiacenza v xs
-   | otherwise = listaArchiAdiacenza v xs
+-- List degli archi in cui il vertex di partenza e' v
+listEdgesAdjacency :: Vertex -> [Edge] -> [Edge]
+listEdgesAdjacency v [] = []
+listEdgesAdjacency v (x:xs)
+   | (fst x)==v  = x : listEdgesAdjacency v xs
+   | otherwise = listEdgesAdjacency v xs
 
 
---epuraLista [] = []
---epuraLista (x:xs) = x : epuraLista (filter (\y -> not(x==y)) xs)
+--purgeList [] = []
+--purgeList (x:xs) = x : purgeList (filter (\y -> not(x==y)) xs)
 
-epuraListaNodi [] = []
-epuraListaNodi (x:xs) = x : epuraListaNodi (filter (\y -> not(vertice x== vertice y)) xs)
+purgeListNodes [] = []
+purgeListNodes (x:xs) = x : purgeListNodes (filter (\y -> not(vertex x== vertex y)) xs)
 
-epuraListaArchi [] = []
-epuraListaArchi (x:xs) = x : epuraListaArchi (filter (\y -> not(x==y)) xs)
+purgeListEdges [] = []
+purgeListEdges (x:xs) = x : purgeListEdges (filter (\y -> not(x==y)) xs)
 
 
 
 -- OPERATORI GRAFO ----------------------------
 
--- Crea un grafo vuoto
-creaGrafo :: Grafo
-creaGrafo = ([],[])
+-- Crea un graph vuoto
+createGraph :: Graph
+createGraph = ([],[])
 
 
--- Verifica che il grafo abbia almeno un nodo
-grafoVuoto :: Grafo -> Bool
-grafoVuoto ([],_) = True
-grafoVuoto g  = False
+-- Verifica che il graph abbia almeno un node
+emptyGraph :: Graph -> Bool
+emptyGraph ([],_) = True
+emptyGraph g  = False
 
 
--- Verifica l'esistenza di un nodo
-esisteNodo :: Vertice -> Grafo -> Bool
-esisteNodo _ ([], _) = False
-esisteNodo v g = any (\x -> x == v) (vertici g)
+-- Verifica l'existsnza di un node
+existsNode :: Vertex -> Graph -> Bool
+existsNode _ ([], _) = False
+existsNode v g = any (\x -> x == v) (vertices g)
 
 
--- Verifica l'esistenza di un arco dal vertice u al vertice v
-esisteArco :: Arco -> Grafo -> Bool
-esisteArco (u,v) g = any (\(x,y) -> x==u && y==v) (getArchi g)
+-- Verifica l'existsnza di un arco dal vertex u al vertex v
+existsEdge :: Edge -> Graph -> Bool
+existsEdge (u,v) g = any (\(x,y) -> x==u && y==v) (getEdges g)
 
 
--- Inserisce un nodo nel grafo se non esiste e se il vertice e' un intero positivo
-insNodo :: Vertice -> Grafo -> Grafo
-insNodo v g
-   | v<0 || esisteNodo v g = g
-   | otherwise = ((getNodi g)++[(v,[])], getArchi g)
+-- Inserisce un node nel graph se non exists e se il vertex e' un intero positivo
+addNode :: Vertex -> Graph -> Graph
+addNode v g
+   | v<0 || existsNode v g = g
+   | otherwise = ((getNodes g)++[(v,[])], getEdges g)
 
 
--- Inserisce un arco nel grafo solo se entrambi i nodi esistono e se l'arco non e' gia' stato aggiunto
-insArco :: Arco -> Grafo -> Grafo
-insArco (_,_) ([],_) = ([],[])
-insArco (u,v) g 
-   | (esisteNodo u g) && (esisteNodo v g) && (not(esisteArco (u,v) g)) = (getNodi g, (getArchi g)++[(u,v)])
+-- Inserisce un arco nel graph solo se entrambi i nodes esistono e se l'arco non e' gia' stato aggiunto
+addEdge :: Edge -> Graph -> Graph
+addEdge (_,_) ([],_) = ([],[])
+addEdge (u,v) g 
+   | (existsNode u g) && (existsNode v g) && (not(existsEdge (u,v) g)) = (getNodes g, (getEdges g)++[(u,v)])
    | otherwise = g
 
 
--- Cancella un nodo solo se non ci sono archi uscenti o entranti
-cancNodo :: Vertice -> Grafo -> Grafo
-cancNodo v g
-   | (esisteNodo v g) && not (any (\(x,y) -> x==v || y==v) (getArchi g)) = (cancN v (getNodi g), getArchi g)
+-- Cancella un node solo se non ci sono archi uscenti o entranti
+deleteNode :: Vertex -> Graph -> Graph
+deleteNode v g
+   | (existsNode v g) && not (any (\(x,y) -> x==v || y==v) (getEdges g)) = (deleteN v (getNodes g), getEdges g)
    | otherwise = g
-   where cancN u xs = if (vertice (head xs))==u 
+   where deleteN u xs = if (vertex (head xs))==u 
                          then tail xs
-                      else head xs : cancN u (tail xs)
+                      else head xs : deleteN u (tail xs)
 
 
 -- Cancella un arco solo se e' presente
-cancArco :: Arco -> Grafo -> Grafo
-cancArco (_,_) ([],_) = ([],[])
-cancArco (u,v) g
-   | esisteNodo u g && esisteNodo v g && esisteArco(u,v) g = (getNodi g, cancA u v (getArchi g))
+deleteEdge :: Edge -> Graph -> Graph
+deleteEdge (_,_) ([],_) = ([],[])
+deleteEdge (u,v) g
+   | existsNode u g && existsNode v g && existsEdge(u,v) g = (getNodes g, deleteA u v (getEdges g))
    | otherwise = g
-   where cancA z k xs = if ((fst (head xs)==z) && (snd (head xs)==k))
+   where deleteA z k xs = if ((fst (head xs)==z) && (snd (head xs)==k))
                            then tail xs
-                        else head xs : cancA z k (tail xs)
+                        else head xs : deleteA z k (tail xs)
 
 
--- Lista dei nodi adiacenti ad un vertice v di un nodo
-adiacenti :: Vertice -> Grafo -> [Nodo]
-adiacenti _ ([],_) = []
-adiacenti _ (_,[]) = []
-adiacenti v g
-   | esisteNodo v g = verticiToNodi (listaAdiacenti v (getArchi g)) g
+-- List dei nodes adjacents ad un vertex v di un node
+adjacents :: Vertex -> Graph -> [Node]
+adjacents _ ([],_) = []
+adjacents _ (_,[]) = []
+adjacents v g
+   | existsNode v g = verticesToNodes (listAdjacents v (getEdges g)) g
    | otherwise = []
 
 
--- Scrive il contenuto di un nodo con vertice v sovrascrivendo l'attributo di tipo Elemento
-scriviNodo :: Vertice -> Elemento -> Grafo -> Grafo
-scriviNodo _ _ ([],_) = ([],[])
-scriviNodo v e g
-   | (esisteNodo v g) = (scriviN v e (getNodi g), getArchi g)
+-- Scrive il contenuto di un node con vertex v sovrascrivendo l'attributo di tipo Element
+putContentNode :: Vertex -> Element -> Graph -> Graph
+putContentNode _ _ ([],_) = ([],[])
+putContentNode v e g
+   | (existsNode v g) = (putContentN v e (getNodes g), getEdges g)
    | otherwise = g
-   where scriviN u k xs = if (vertice (head xs))==u 
+   where putContentN u k xs = if (vertex (head xs))==u 
                              then (u,k) : tail xs
-                          else head xs : scriviN u k (tail xs)
+                          else head xs : putContentN u k (tail xs)
 
 
--- Legge il valore di tipo Elemento presente in un nodo con vertice v
-leggiNodo :: Vertice -> Grafo -> Elemento
-leggiNodo _ ([],_) = []
-leggiNodo v g 
-   | esisteNodo v g = elemento (head(trovaNodo v g))
+-- Legge il valore di tipo Element presente in un node con vertex v
+readNode :: Vertex -> Graph -> Element
+readNode _ ([],_) = []
+readNode v g 
+   | existsNode v g = element (head(findNode v g))
    | otherwise = []
 
 
@@ -218,274 +217,274 @@ leggiNodo v g
 -- VISITA DI UN GRAFO ----------------------------
 
 -- Depth First Search 
-depthFirstSearch :: Vertice -> Grafo -> [Nodo]
+depthFirstSearch :: Vertex -> Graph -> [Node]
 depthFirstSearch v g
-   | esisteNodo v g = if (null(adiacenti v g)) then trovaNodo v g else dfs [v] (trovaNodo v g) g
+   | existsNode v g = if (null(adjacents v g)) then findNode v g else dfs [v] (findNode v g) g
    | otherwise = []
 
 
 -- Visita DFS ricorsiva
--- input: lista di vertici visitati, pila di nodi per accumulare quelli da visitare, grafo da visitare
-dfs :: [Vertice]-> [Nodo] -> Grafo -> [Nodo]
+-- input: list di vertices visitati, pila di nodes per accumulare quelli da visitare, graph da visitare
+dfs :: [Vertex]-> [Node] -> Graph -> [Node]
 dfs _ [] _ = []
-dfs vs (n:ns) g = n : dfs (vs++[vertice n]) (inPilaNodi (vertice n) (vs++[vertice n]) (adiacenti (vertice n) g) ns) g
+dfs vs (n:ns) g = n : dfs (vs++[vertex n]) (inStackNodes (vertex n) (vs++[vertex n]) (adjacents (vertex n) g) ns) g
 
--- Crea una pila di nodi partendo da una lista di nodi gia' accumulati (xs), 
--- una lista di nodi nuovi (vs cioe' gli adiacenti a v), la lista dei nodi gia' visitati (ns) ed 
--- il vertice del nodo appena letto dalla pila al fine di evitarne il reinserimento.
-inPilaNodi :: Vertice -> [Vertice] -> [Nodo] -> [Nodo] -> [Nodo]
-inPilaNodi v ns [] xs = xs
-inPilaNodi v ns vs xs = (filter (\x-> (not(any (\y->x==y || v==(vertice x)) xs))) (filter (\z-> not(elem (vertice z) ns)) vs))++xs
+-- Crea una pila di nodes partendo da una list di nodes gia' accumulati (xs), 
+-- una list di nodes nuovi (vs cioe' gli adjacents a v), la list dei nodes gia' visitati (ns) ed 
+-- il vertex del node appena letto dalla pila al fine di evitarne il reinserimento.
+inStackNodes :: Vertex -> [Vertex] -> [Node] -> [Node] -> [Node]
+inStackNodes v ns [] xs = xs
+inStackNodes v ns vs xs = (filter (\x-> (not(any (\y->x==y || v==(vertex x)) xs))) (filter (\z-> not(elem (vertex z) ns)) vs))++xs
 
 
 
 -- Breadth First Search
-breadthFirstSearch :: Vertice -> Grafo -> [Nodo]
+breadthFirstSearch :: Vertex -> Graph -> [Node]
 breadthFirstSearch v g
-	| esisteNodo v g = if (null(adiacenti v g)) then trovaNodo v g else bfs [v] (trovaNodo v g) g 
+	| existsNode v g = if (null(adjacents v g)) then findNode v g else bfs [v] (findNode v g) g 
 	| otherwise = []
 
 
 -- Visita BFS ricorsiva
--- input: coda di nodi per accumulare quelli da visitare, grafo da visitare
-bfs :: [Vertice]-> [Nodo] -> Grafo -> [Nodo]
+-- input: coda di nodes per accumulare quelli da visitare, graph da visitare
+bfs :: [Vertex]-> [Node] -> Graph -> [Node]
 bfs _ [] _ = []
-bfs vs (n:ns) g = n : bfs (vs++[vertice n]) (inCodaNodi (vertice n) (vs++[vertice n]) (adiacenti (vertice n) g) ns) g
+bfs vs (n:ns) g = n : bfs (vs++[vertex n]) (inQueueNodes (vertex n) (vs++[vertex n]) (adjacents (vertex n) g) ns) g
 
 
--- Crea una coda di nodi partendo da una lista di nodi gia' accumulati (xs), 
--- una lista di nodi nuovi (vs cioe' gli adiacenti a v), la lista dei nodi gia' visitati (ns) ed
--- il vertice del nodo appena letto dalla coda al fine di evitarne il reinserimento.
-inCodaNodi :: Vertice -> [Vertice] -> [Nodo] -> [Nodo] -> [Nodo]
-inCodaNodi v ns [] xs = xs
-inCodaNodi v ns vs xs = xs ++ (filter (\x-> (not(any (\y->x==y || v==(vertice x)) xs))) (filter (\z-> not(elem (vertice z) ns)) vs))
+-- Crea una coda di nodes partendo da una list di nodes gia' accumulati (xs), 
+-- una list di nodes nuovi (vs cioe' gli adjacents a v), la list dei nodes gia' visitati (ns) ed
+-- il vertex del node appena letto dalla coda al fine di evitarne il reinserimento.
+inQueueNodes :: Vertex -> [Vertex] -> [Node] -> [Node] -> [Node]
+inQueueNodes v ns [] xs = xs
+inQueueNodes v ns vs xs = xs ++ (filter (\x-> (not(any (\y->x==y || v==(vertex x)) xs))) (filter (\z-> not(elem (vertex z) ns)) vs))
 
 
 
 -- FUNZIONI AGGIUNTIVE --------------------------
 
--- Traspone il grafo invertendo il verso degli archi
-trasposto :: Grafo -> Grafo
-trasposto g = (getNodi g, [(x,y) | (y,x)<-(getArchi g)])
+-- Traspone il graph invertendo il verso degli archi
+transposed :: Graph -> Graph
+transposed g = (getNodes g, [(x,y) | (y,x)<-(getEdges g)])
 
--- Verifica che non vi sia nessun ciclo nel grafo
-aciclico :: Grafo -> Bool
-aciclico g
-   | grafoVuoto g = False
-   | otherwise = not(any (\x-> esisteCammino x x g) (vertici g))
+-- Verifica che non vi sia nessun ciclo nel graph
+acyclic :: Graph -> Bool
+acyclic g
+   | emptyGraph g = False
+   | otherwise = not(any (\x-> existsCammino x x g) (vertices g))
 
--- Verifica che un nodo u possa raggiungere un nodo v direttamente o indirettamente tramite le adiacenze
--- Ogni cammino considerato ha lunghezza >= 1. Ogni nodo ha un cammino di lunghezza zero per se stesso.
-esisteCammino :: Vertice -> Vertice -> Grafo -> Bool
-esisteCammino _ _ ([],_) = False
-esisteCammino _ _ ([_],_)= False
-esisteCammino u v g
-   | (esisteNodo u g) && (esisteNodo v g) = path v [u] (trovaNodo u g) g
+-- Verifica che un node u possa raggiungere un node v direttamente o indirettamente tramite le adiacenze
+-- Ogni cammino considerato ha lunghezza >= 1. Ogni node ha un cammino di lunghezza zero per se stesso.
+existsCammino :: Vertex -> Vertex -> Graph -> Bool
+existsCammino _ _ ([],_) = False
+existsCammino _ _ ([_],_)= False
+existsCammino u v g
+   | (existsNode u g) && (existsNode v g) = path v [u] (findNode u g) g
    | otherwise = False
 
 {-
-  Funzione path per determinare l'esistenza di un
-  cammino tra due nodi.
-  input: vertice arrivo, coda di nodi, grafo da visitare
-  e' una visita BFS con verifica di esistenza dell'arco per ogni coppia di nodi in sequenza
-  fino ad arrivare al nodo di interesse. 
-  Verifica che il nodo di arrivo sia gia' stato inserito nella coda. 
-  Se il nodo "u" e' presente in coda mi fermo.
-  Il vertice del nodo di arrivo "u" e' un parametro fisso per ogni chiamata della funzione path
+  Funzione path per determinare l'existsnza di un
+  cammino tra due nodes.
+  input: vertex arrivo, coda di nodes, graph da visitare
+  e' una visita BFS con verifica di existsnza dell'arco per ogni coppia di nodes in sequenza
+  fino ad arrivare al node di interesse. 
+  Verifica che il node di arrivo sia gia' stato inserito nella coda. 
+  Se il node "u" e' presente in coda mi fermo.
+  Il vertex del node di arrivo "u" e' un parametro fisso per ogni chiamata della funzione path
 -}
 
-path :: Vertice -> [Vertice] -> [Nodo] -> Grafo -> Bool
+path :: Vertex -> [Vertex] -> [Node] -> Graph -> Bool
 path _ _ [] _ = False
 path u vs (n:ns) g
-	| (not(esisteArco ((vertice n),u) g)) && (not(any(\x->vertice x==u)(ns))) = prosegui
+	| (not(existsEdge ((vertex n),u) g)) && (not(any(\x->vertex x==u)(ns))) = go
 	| otherwise = True
-	where prosegui = path u (vs++[vertice n]) (inCodaNodi (vertice n) (vs++[vertice n]) (adiacenti (vertice n) g) ns) g
+	where go = path u (vs++[vertex n]) (inQueueNodes (vertex n) (vs++[vertex n]) (adjacents (vertex n) g) ns) g
                                            
 
--- Verifica che il grafo sia fortemente connesso, cioe' che per ogni coppia di nodi esista un cammino
-fortementeConnesso :: Grafo -> Bool
-fortementeConnesso ([], _) = False
-fortementeConnesso ([n], _) = False
-fortementeConnesso g = fconn 0 g
+-- Verifica che il graph sia fortemente connesso, cioe' che per ogni coppia di nodes esista un cammino
+highlyConnectedGraph :: Graph -> Bool
+highlyConnectedGraph ([], _) = False
+highlyConnectedGraph ([n], _) = False
+highlyConnectedGraph g = hConn 0 g
 
--- Verifica l'esistenza dei cammini tra le coppie di nodi, per ogni nodo del grafo
--- si utilizza un contatore per ripetere la funzione su ogni nodo del grafo
-fconn :: Int -> Grafo -> Bool
-fconn c g
-   | (c < (length (vertici g))) = if esisteConnessione (vertice(primoNodo g)) (getNodi g)  g 
-                                     then fconn (c+1) (succNodi g ++ [primoNodo g] ,getArchi g) 
+-- Verifica l'existsnza dei cammini tra le coppie di nodes, per ogni node del graph
+-- si utilizza un contatore per ripetere la funzione su ogni node del graph
+hConn :: Int -> Graph -> Bool
+hConn c g
+   | (c < (length (vertices g))) = if existsConnection (vertex(firstNode g)) (getNodes g)  g 
+                                     then hConn (c+1) (nextNodes g ++ [firstNode g] ,getEdges g) 
                                   else False
    | otherwise = True
 
 
--- Confronta un nodo con tutti gli altri per verificare che esista un cammino per ogni nodo confrontato
-esisteConnessione :: Vertice -> [Nodo] -> Grafo -> Bool
-esisteConnessione _ [] _ = True 
-esisteConnessione v (n:ns) g
-   | esisteCammino v (vertice n) g  = esisteConnessione v ns g
+-- Confronta un node con tutti gli altri per verificare che esista un cammino per ogni node confrontato
+existsConnection :: Vertex -> [Node] -> Graph -> Bool
+existsConnection _ [] _ = True 
+existsConnection v (n:ns) g
+   | existsCammino v (vertex n) g  = existsConnection v ns g
    | otherwise = False
 
 
 
 -- STAMPA GRAFO ----------------------------
 
-stampaGrafo :: [Vertice] -> Grafo -> IO ()
-stampaGrafo [] _  = return ()
-stampaGrafo (v:vs) g  = do putStr (show v)
+printGraph :: [Vertex] -> Graph -> IO ()
+printGraph [] _  = return ()
+printGraph (v:vs) g  = do putStr (show v)
                            putStr "\t"
-                           putStr (show (leggiNodo v g))
+                           putStr (show (readNode v g))
                            putStr "\t"
-                           putStr (show (nodiToVertici (adiacenti v g)))
+                           putStr (show (nodesToVertices (adjacents v g)))
                            putStr "\n"
-                           stampaGrafo vs g
+                           printGraph vs g
 
 
 
 -- MENU' GESTIONE ----------------------------
 
-main = gestioneGrafo creaGrafo
+main = manageGraph createGraph
 
-inputGrafo :: Grafo -> IO ()
-inputGrafo g = gestioneGrafo (epuraListaNodi (getNodi g), epuraListaArchi (getArchi g))
+inputGraph :: Graph -> IO ()
+inputGraph g = manageGraph (purgeListNodes (getNodes g), purgeListEdges (getEdges g))
 
-gestioneGrafo :: Grafo -> IO ()
-gestioneGrafo g = do putStrLn "\n\n*** Menu' Grafo ***"
-                     putStrLn "\n1. Inserisci nodo\n2. Inserisci arco\n3. Cancella nodo\n4. Cancella arco\n5. Scrivi contenuto nodo\n6. Adiacenti nodo\n7. Depth first search\n8. Breadth first search\n9. Grafo trasposto\n10. Verifica esistenza cammino\n11. Stampa grafo\n0. Esci"
-                     --putStr "\n\n*** Grafo corrente ***\n"
-                     --stampaGrafo (vertici g) g
+manageGraph :: Graph -> IO ()
+manageGraph g = do putStrLn "\n\n*** Menu' Graph ***"
+                     putStrLn "\n1. Inserisci node\n2. Inserisci arco\n3. Cancella node\n4. Cancella arco\n5. Scrivi contenuto node\n6. Adjacents node\n7. Depth first search\n8. Breadth first search\n9. Graph transposed\n10. Verifica existsnza cammino\n11. Print graph\n0. Esci"
+                     --putStr "\n\n*** Graph corrente ***\n"
+                     --printGraph (vertices g) g
                      hFlush stdout
                      putStr "\n\nQuale operazione vuoi eseguire? (indica il numero) : "
                      scelta <- getLine
                      let s = read (scelta)::Int
                      case () of _
-                                 | s==1  -> gInserisciNodo g
-                                 | s==2  -> gInserisciArco g
-                                 | s==3  -> gCancellaNodo  g
-                                 | s==4  -> gCancellaArco  g
-                                 | s==5  -> gScriviNodo    g
-                                 | s==6  -> gAdiacentiNodo g
+                                 | s==1  -> gAddNode g
+                                 | s==2  -> gAddEdge g
+                                 | s==3  -> gDeleteNode  g
+                                 | s==4  -> gDeleteEdge  g
+                                 | s==5  -> gWriteNode    g
+                                 | s==6  -> gAdjacentsNode g
                                  | s==7  -> gDfs g
                                  | s==8  -> gBfs g
-                                 | s==9  -> gTrasposto g
-                                 | s==10 -> gEsisteCammino g
-                                 | s==11 -> gStampaGrafo g
-                                 | s==0  -> putStr "\n\nEsecuzione terminata\n"
-                                 | otherwise -> gestioneGrafo g
+                                 | s==9  -> gTransposed g
+                                 | s==10 -> gExistsPath g
+                                 | s==11 -> gPrintGraph g
+                                 | s==0  -> putStr "\n\nExit. Bye!\n"
+                                 | otherwise -> manageGraph g
 
 
 
-gInserisciNodo g = do putStr "Inserisci vertice: "
+gAddNode g = do putStr "Inserisci vertex: "
                       v <- getLine
                       putStr "Inserisci il contenuto (premi invio per lasciare vuoto): "
                       contenuto <- getLine 
                       if v==[]
-                         then gestioneGrafo g
-                      else gestioneGrafo (scriviNodo (read(v)::Int) contenuto (insNodo (read(v)::Int) g))
+                         then manageGraph g
+                      else manageGraph (putContentNode (read(v)::Int) contenuto (addNode (read(v)::Int) g))
                                
 
-gInserisciArco g = do putStr "Inserisci vertice nodo Partenza: "
+gAddEdge g = do putStr "Inserisci vertex node Partenza: "
                       v <- getLine
-                      putStr "Inserisci vertice nodo Arrivo: "
+                      putStr "Inserisci vertex node Arrivo: "
                       u <- getLine
                       if (v==[] || u==[])
-                         then gestioneGrafo g 
-                      else gestioneGrafo (insArco ((read(v)::Int), (read(u)::Int)) g)
+                         then manageGraph g 
+                      else manageGraph (addEdge ((read(v)::Int), (read(u)::Int)) g)
 
 
-gCancellaNodo g = do putStr "Inserisci vertice: "
+gDeleteNode g = do putStr "Inserisci vertex: "
                      v <- getLine
                      if v==[] 
-                        then gestioneGrafo g 
-                     else gestioneGrafo (cancNodo (read(v)::Int) g)
+                        then manageGraph g 
+                     else manageGraph (deleteNode (read(v)::Int) g)
 
 
-gCancellaArco g = do putStr "Inserisci vertice nodo Partenza: "
+gDeleteEdge g = do putStr "Inserisci vertex node Partenza: "
                      v <- getLine
-                     putStr "Inserisci vertice nodo Arrivo: "
+                     putStr "Inserisci vertex node Arrivo: "
                      u <- getLine
                      if (v==[] || u==[])
-                        then gestioneGrafo g 
-                     else gestioneGrafo (cancArco ((read(v)::Int), (read(u)::Int)) g)
+                        then manageGraph g 
+                     else manageGraph (deleteEdge ((read(v)::Int), (read(u)::Int)) g)
 
 
-gScriviNodo g = do putStr "Inserisci vertice: "
+gWriteNode g = do putStr "Inserisci vertex: "
                    v <- getLine
                    putStr "Inserisci il contenuto (premi invio per lasciare vuoto): "
                    contenuto <- getLine 
                    if v==[] 
-                      then gestioneGrafo g 
-                   else gestioneGrafo (scriviNodo (read(v)::Int) contenuto  g)
+                      then manageGraph g 
+                   else manageGraph (putContentNode (read(v)::Int) contenuto  g)
 
 
-gAdiacentiNodo g = do putStr "Inserisci vertice: "
+gAdjacentsNode g = do putStr "Inserisci vertex: "
                       v <- getLine
                       if v==[] 
-                         then gestioneGrafo g 
-                      else do putStr "Lista di adiacenza per il nodo con vertice "
+                         then manageGraph g 
+                      else do putStr "List di adiacenza per il node con vertex "
                               putStrLn (show v)
-                              putStr (show(adiacenti (read(v)::Int) g))
+                              putStr (show(adjacents (read(v)::Int) g))
                               putStr "\n\nPremere invio per continuare..."
                               c<-getChar
-                              gestioneGrafo g
+                              manageGraph g
 
 
 gDfs g = do putStr "Depth First Search\n"
-            if not (grafoVuoto g) 
-               then do putStr "Da quale vertice vuoi partire: "
+            if not (emptyGraph g) 
+               then do putStr "Da quale vertex vuoi partire: "
                        v <- getLine
                        if v==[] 
-                          then gestioneGrafo g 
+                          then manageGraph g 
                        else do putStr "\n\n*** DFS ***\n"
-                               putStr (show (nodiToVertici(depthFirstSearch ((read v)::Int) g)))
+                               putStr (show (nodesToVertices(depthFirstSearch ((read v)::Int) g)))
                                putStr "\n\nPremere invio per continuare..."
                                c<-getChar
-                               gestioneGrafo g
-            else do putStr "\nImpossibile visitare il grafo perche' e' vuoto!"
-                    gestioneGrafo g
+                               manageGraph g
+            else do putStr "\nImpossibile visitare il graph perche' e' vuoto!"
+                    manageGraph g
 
 
 gBfs g = do putStr "Breadth First Search\n"
-            if not (grafoVuoto g) 
-               then do putStr "Da quale vertice vuoi partire: "
+            if not (emptyGraph g) 
+               then do putStr "Da quale vertex vuoi partire: "
                        v <- getLine
                        if v==[] 
-                          then gestioneGrafo g 
+                          then manageGraph g 
                        else do putStr "\n\n*** BFS ***\n"
-                               putStr (show (nodiToVertici(breadthFirstSearch ((read v)::Int) g)))
+                               putStr (show (nodesToVertices(breadthFirstSearch ((read v)::Int) g)))
                                putStr "\n\nPremere invio per continuare..."
                                c<-getChar
-                               gestioneGrafo g
-            else do putStr "\nImpossibile visitare il grafo perche' e' vuoto!"
-                    gestioneGrafo g
+                               manageGraph g
+            else do putStr "\nImpossibile visitare il graph perche' e' vuoto!"
+                    manageGraph g
 
 
 
 
-gTrasposto g = do gestioneGrafo (trasposto g)
+gTransposed g = do manageGraph (transposed g)
 
 
-gEsisteCammino g = do putStr "Inserisci vertice nodo Partenza: "
+gExistsPath g = do putStr "Inserisci vertex node Partenza: "
                       v <- getLine
-                      putStr "Inserisci vertice nodo Arrivo: "
+                      putStr "Inserisci vertex node Arrivo: "
                       u <- getLine
                       if (v==[] || u==[]) 
-                         then gestioneGrafo g 
-                      else do if (esisteCammino (read(v)::Int) (read(u)::Int) g) 
+                         then manageGraph g 
+                      else do if (existsCammino (read(v)::Int) (read(u)::Int) g) 
                                  then putStrLn "\nEsiste almeno un cammino" 
-                              else putStrLn "\nNon esiste nessun cammino"
+                              else putStrLn "\nNon exists nessun cammino"
                               putStr "\n\nPremere invio per continuare..."
                               c<-getChar
-                              gestioneGrafo g
+                              manageGraph g
 
 
 
-gStampaGrafo g = do stampaGrafo (vertici g) g
-                    if fortementeConnesso g 
-                       then putStr "\n\nIl grafo e' fortemente connesso"
-                    else putStr "\n\nIl grafo e' debolmente connesso"
-                    if aciclico g 
-                       then putStr "\n\nIl grafo e' aciclico\n"
-                    else putStr "\n\nIl grafo non e' aciclico\n"
-                    gestioneGrafo g
+gPrintGraph g = do printGraph (vertices g) g
+                    if highlyConnectedGraph g 
+                       then putStr "\n\nIl graph e' fortemente connesso"
+                    else putStr "\n\nIl graph e' debolmente connesso"
+                    if acyclic g 
+                       then putStr "\n\nIl graph e' acyclic\n"
+                    else putStr "\n\nIl graph non e' acyclic\n"
+                    manageGraph g
 
 
