@@ -2,7 +2,7 @@
    *******************************************
    *                                         *
    *        Graph data type structure        *
-   *  		                                 *
+   *  		                             *
    * main function: main                     *
    * or: inputGraph <graph>                  *
    *******************************************
@@ -28,7 +28,7 @@ or
 
 import System.IO
 
--- TIPI --------------------------
+-- TYPES --------------------------
 
 type Vertex = Int
 type Element = String
@@ -45,7 +45,7 @@ element :: Node -> Element
 element n = snd n
 
 
--- FUNZIONI DI SUPPORTO ------------------------------
+-- SUPPORT FUNCTIONS ------------------------------
 
 --safetail [] = []
 --safetail (_:xs) = xs
@@ -125,7 +125,7 @@ purgeListEdges (x:xs) = x : purgeListEdges (filter (\y -> not(x==y)) xs)
 
 
 
--- OPERATORI GRAFO ----------------------------
+-- GRAPH OPERATORS ----------------------------
 
 -- Crea un graph vuoto
 createGraph :: Graph
@@ -271,20 +271,20 @@ transposed g = (getNodes g, [(x,y) | (y,x)<-(getEdges g)])
 acyclic :: Graph -> Bool
 acyclic g
    | emptyGraph g = False
-   | otherwise = not(any (\x-> existsCammino x x g) (vertices g))
+   | otherwise = not(any (\x-> existsPath x x g) (vertices g))
 
 -- Verifica che un node u possa raggiungere un node v direttamente o indirettamente tramite le adiacenze
--- Ogni cammino considerato ha lunghezza >= 1. Ogni node ha un cammino di lunghezza zero per se stesso.
-existsCammino :: Vertex -> Vertex -> Graph -> Bool
-existsCammino _ _ ([],_) = False
-existsCammino _ _ ([_],_)= False
-existsCammino u v g
+-- Ogni path considerato ha lunghezza >= 1. Ogni node ha un path di lunghezza zero per se stesso.
+existsPath :: Vertex -> Vertex -> Graph -> Bool
+existsPath _ _ ([],_) = False
+existsPath _ _ ([_],_)= False
+existsPath u v g
    | (existsNode u g) && (existsNode v g) = path v [u] (findNode u g) g
    | otherwise = False
 
 {-
   Funzione path per determinare l'existsnza di un
-  cammino tra due nodes.
+  path tra due nodes.
   input: vertex arrivo, coda di nodes, graph da visitare
   e' una visita BFS con verifica di existsnza dell'arco per ogni coppia di nodes in sequenza
   fino ad arrivare al node di interesse. 
@@ -301,7 +301,7 @@ path u vs (n:ns) g
 	where go = path u (vs++[vertex n]) (inQueueNodes (vertex n) (vs++[vertex n]) (adjacents (vertex n) g) ns) g
                                            
 
--- Verifica che il graph sia fortemente connesso, cioe' che per ogni coppia di nodes esista un cammino
+-- Verifica che il graph sia fortemente connesso, cioe' che per ogni coppia di nodes esista un path
 highlyConnectedGraph :: Graph -> Bool
 highlyConnectedGraph ([], _) = False
 highlyConnectedGraph ([n], _) = False
@@ -317,11 +317,11 @@ hConn c g
    | otherwise = True
 
 
--- Confronta un node con tutti gli altri per verificare che esista un cammino per ogni node confrontato
+-- Confronta un node con tutti gli altri per verificare che esista un path per ogni node confrontato
 existsConnection :: Vertex -> [Node] -> Graph -> Bool
 existsConnection _ [] _ = True 
 existsConnection v (n:ns) g
-   | existsCammino v (vertex n) g  = existsConnection v ns g
+   | existsPath v (vertex n) g  = existsConnection v ns g
    | otherwise = False
 
 
@@ -349,7 +349,7 @@ inputGraph g = manageGraph (purgeListNodes (getNodes g), purgeListEdges (getEdge
 
 manageGraph :: Graph -> IO ()
 manageGraph g = do putStrLn "\n\n*** Menu' Graph ***"
-                     putStrLn "\n1. Inserisci node\n2. Inserisci arco\n3. Cancella node\n4. Cancella arco\n5. Scrivi contenuto node\n6. Adjacents node\n7. Depth first search\n8. Breadth first search\n9. Graph transposed\n10. Verifica existsnza cammino\n11. Print graph\n0. Esci"
+                     putStrLn "\n1. Inserisci node\n2. Inserisci arco\n3. Cancella node\n4. Cancella arco\n5. Scrivi contenuto node\n6. Adjacents node\n7. Depth first search\n8. Breadth first search\n9. Graph transposed\n10. Verifica existsnza path\n11. Print graph\n0. Esci"
                      --putStr "\n\n*** Graph corrente ***\n"
                      --printGraph (vertices g) g
                      hFlush stdout
@@ -469,9 +469,9 @@ gExistsPath g = do putStr "Inserisci vertex node Partenza: "
                       u <- getLine
                       if (v==[] || u==[]) 
                          then manageGraph g 
-                      else do if (existsCammino (read(v)::Int) (read(u)::Int) g) 
-                                 then putStrLn "\nEsiste almeno un cammino" 
-                              else putStrLn "\nNon exists nessun cammino"
+                      else do if (existsPath (read(v)::Int) (read(u)::Int) g) 
+                                 then putStrLn "\nEsiste almeno un path" 
+                              else putStrLn "\nNon exists nessun path"
                               putStr "\n\nPremere invio per continuare..."
                               c<-getChar
                               manageGraph g
