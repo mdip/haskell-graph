@@ -65,7 +65,7 @@ type Node = (Vertex, Element)
 type Graph = ([Node], [Edge])
 
 
--- Funzioni per leggere i singoli elementi di un Node
+-- Read a single element given a node
 vertex :: Node -> Vertex
 vertex n = fst n
 
@@ -73,68 +73,68 @@ element :: Node -> Element
 element n = snd n
 
 
--- SUPPORT FUNCTIONS ------------------------------
+-- Support functions ------------------------------
 
 --safetail [] = []
 --safetail (_:xs) = xs
 
--- Primo node della list di nodes di un graph
+-- First node of the node list that represents the graph
 firstNode :: Graph -> Node
 firstNode   g = head (fst g)
 
--- List dei nodes di un graph successivi al first
+-- Tail of the list of nodes that represents the graph
 nextNodes :: Graph -> [Node]
 nextNodes ([], _) = []
 nextNodes  g = tail (fst g)
 
--- List di tutti i nodes di un graph
+-- List of all nodes of the graph
 getNodes :: Graph -> [Node]
 getNodes  ([], _) = []
 getNodes   g = fst g
 
--- Primo arco della list di archi di un graph
+-- First edge of the node list that represents the graph
 firstEdge :: Graph -> Edge
 firstEdge g = head (snd g)
 
--- List degli archi di un graph successivi al first
+-- Tail of the list of edges that represents the graph
 nextEdges :: Graph -> [Edge]
 nextEdges (_, []) = []
 nextEdges g = tail (snd g)
 
--- List di tutti gli archi di un graph
+-- List of all edges of the graph
 getEdges :: Graph -> [Edge]
 getEdges (_, []) = []
 getEdges  g = snd g
 
--- Trova un node nel graph partendo dal suo vertex
+-- Find a node from its vertex id
 findNode :: Vertex -> Graph -> [Node]
 findNode _ ([], _) = []
 findNode v g 
    | v == vertex (firstNode g) = [firstNode g]
    | otherwise = findNode v (nextNodes g, [])
 
--- List di tutti i vertices di un graph
+-- List of all vertices of the graph
 vertices :: Graph -> [Vertex]
 vertices g = map (vertex) (getNodes g)
 
--- Converte una list di vertices in una list di nodes
+-- List of vertices from a list of nodes
 verticesToNodes :: [Vertex] -> Graph -> [Node]
 verticesToNodes [] _ = []
 verticesToNodes (v : vs) g = findNode v g ++ verticesToNodes vs g
 
--- Converte una list di nodes in una list di vertices
+-- List of nodes from a list of vertices
 nodesToVertices :: [Node] -> [Vertex]
 nodesToVertices [] = []
 nodesToVertices (v : vs) = (vertex v) : nodesToVertices vs
 
--- List dei vertices adjacents ad un node con vertex v
+-- List of adjacent vertices of a vertex v
 listAdjacents :: Vertex -> [Edge] -> [Vertex]
 listAdjacents v [] = []
 listAdjacents v (x : xs)
    | (fst x) == v = snd x : listAdjacents v xs
    | otherwise = listAdjacents v xs
 
--- List degli archi in cui il vertex di partenza e' v
+-- List of edges where the starting vertex is a given vertex v
 listEdgesAdjacency :: Vertex -> [Edge] -> [Edge]
 listEdgesAdjacency v [] = []
 listEdgesAdjacency v (x : xs)
