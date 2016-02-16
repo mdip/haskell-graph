@@ -1,3 +1,5 @@
 
-A Graph data type implementation in Haskell with some functions to manage the data structure.
+## Directed graph in Haskell
+
+A simple and slow directed graph implementation using only lists and pairs.
 
