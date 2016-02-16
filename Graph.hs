@@ -188,8 +188,7 @@ acyclic g
 -- Verify that a node u can be reach a node v directly or indirectly using adjacencies
 -- Every path has a length >= 1. Self-loops are avoided.
 existsPath :: Vertex -> Vertex -> Graph -> Bool
-existsPath _ _ ([], _) = False
-existsPath _ _ ([_], _)= False
+existsPath _ _ (_, []) = False
 existsPath u v g
   | (existsNode u g) && (existsNode v g) = path v [u] [(node u g)] g
   | otherwise = False
@@ -200,3 +199,4 @@ existsPath u v g
           where go = path u (vs ++ [vertex n]) (inQueueNodes (vertex n) (vs ++ [vertex n]) (adjacents (vertex n) g) ns) g
                 inQueueNodes v ns [] xs = xs
                 inQueueNodes v ns vs xs = xs ++ (filter (\x -> (not (any (\y->x == y || v == (vertex x)) xs))) (filter (\z-> not (elem (vertex z) ns)) vs))
+
