@@ -1,3 +1,5 @@
+{-# LANGUAGE TypeSynonymInstances, OverlappingInstances #-}
+{-# LANGUAGE FlexibleInstances #-}
 
 -- | A simple and slow directed graph implementation using only lists and pairs.
 
@@ -32,11 +34,22 @@ module Graph
 , existsPath
   ) where
 
+import Data.List as List
+
 type Vertex = Int
 type Element = String
 type Edge = (Vertex, Vertex)
 type Node = (Vertex, Element)
 type Graph = ([Node], [Edge])
+
+instance Show Graph where
+    show g = "\n Graph:" ++ "\n"
+              ++ "\tVertices: " ++ "{" ++ List.intercalate "," [show v | v <- vertices g] ++ "}" ++ "\n"
+              ++ "\tEdges: " ++ "{" ++ List.intercalate "," [show e | e <- edges g] ++ "}" ++ "\n"
+              ++ "\tElements: " ++ "{" ++ List.intercalate "," [show (element n) | n <- nodes g] ++ "}\n"
+
+instance Show Node where
+    show n = show (vertex n)
 
 -- | Get the vertex of a given node
 vertex :: Node -> Vertex
@@ -107,6 +120,11 @@ addEdge :: Graph -> Edge -> Graph
 addEdge g (u, v) 
   | (existsNode u g) && (existsNode v g) && (not(existsEdge (u, v) g)) = (nodes g, (u, v):(edges g))
   | otherwise = g
+
+-- Create a new graph from a list of vertices
+fromList :: [Vertex] -> Graph
+fromList [] = empty
+fromList v = addNode (fromList (tail v)) (head v, "")  
 
 -- Create a new graph from a list of nodes
 fromNodeList :: [Node] -> Graph
