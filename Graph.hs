@@ -54,12 +54,10 @@ node v g
 
 -- All nodes of the graph
 nodes :: Graph -> [Node]
-nodes ([], _) = []
 nodes g = fst g
 
 -- All edges of the graph
 edges :: Graph -> [Edge]
-edges (_, []) = []
 edges  g = snd g
 
 -- All vertices of the graph
@@ -131,7 +129,7 @@ deleteNode v g
 
 -- Delete an edge if it exists
 deleteEdge :: Edge -> Graph -> Graph
-deleteEdge (u,v) g
+deleteEdge (u, v) g
   | existsNode u g && existsNode v g && existsEdge(u, v) g = (nodes g, deleteA u v (edges g))
   | otherwise = g
   where deleteA z k xs = if ((fst (head xs) == z) && (snd (head xs) == k)) then tail xs else head xs : deleteA z k (tail xs)
@@ -162,7 +160,7 @@ getNodeElement v g
 -- Depth First Search 
 depthFirstSearch :: Vertex -> Graph -> [Node]
 depthFirstSearch v g
-  | existsNode v g = if (null(adjacents v g)) then [node v g] else dfs [v] [node v g] g
+  | existsNode v g = if (null (adjacents v g)) then [node v g] else dfs [v] [node v g] g
   | otherwise = []
     where dfs _ [] _ = []
           dfs vs (n:ns) g = n : dfs (vs ++ [vertex n]) (inStackNodes (vertex n) (vs ++ [vertex n]) (adjacents (vertex n) g) ns) g
