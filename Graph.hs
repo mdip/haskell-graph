@@ -1,4 +1,4 @@
-{-# LANGUAGE TypeSynonymInstances, OverlappingInstances #-}
+{-# LANGUAGE TypeSynonymInstances #-}
 {-# LANGUAGE FlexibleInstances #-}
 
 -- | A simple and slow directed graph implementation using only lists and pairs.
@@ -20,6 +20,7 @@ module Graph
 , existsSelfLoop
 , addNode
 , addEdge
+, fromList
 , fromNodeList
 , fromNodeList1
 , fromEdgeList
@@ -42,13 +43,13 @@ type Edge = (Vertex, Vertex)
 type Node = (Vertex, Element)
 type Graph = ([Node], [Edge])
 
-instance Show Graph where
+instance {-# OVERLAPS #-} Show Graph where
     show g = "\n Graph:" ++ "\n"
               ++ "\tVertices: " ++ "{" ++ List.intercalate "," [show v | v <- vertices g] ++ "}" ++ "\n"
               ++ "\tEdges: " ++ "{" ++ List.intercalate "," [show e | e <- edges g] ++ "}" ++ "\n"
               ++ "\tElements: " ++ "{" ++ List.intercalate "," [show (element n) | n <- nodes g] ++ "}\n"
 
-instance Show Node where
+instance {-# OVERLAPS #-} Show Node where
     show n = show (vertex n)
 
 -- | Get the vertex of a given node
