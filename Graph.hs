@@ -60,12 +60,6 @@ vertex n = fst n
 element :: Node -> Element
 element n = snd n
 
--- Get a node given its vertex id
-node :: Vertex -> Graph -> Node
-node v g 
-  | v == vertex (head (fst g)) = head (fst g)
-  | otherwise = node v (tail (fst g), edges g)
-
 -- All nodes of the graph
 nodes :: Graph -> [Node]
 nodes g = fst g
@@ -77,6 +71,12 @@ edges  g = snd g
 -- All vertices of the graph
 vertices :: Graph -> [Vertex]
 vertices g = map vertex (nodes g)
+
+-- Get a node given its vertex id
+node :: Vertex -> Graph -> Node
+node v g 
+  | v == vertex (head (nodes g)) = head (nodes g)
+  | otherwise = node v (tail (nodes g), edges g)
 
 -- List of nodes from a list of vertices
 verticesToNodes :: [Vertex] -> Graph -> [Node]
@@ -216,4 +216,3 @@ existsPath u v g
           where go = path u (vs ++ [vertex n]) (inQueueNodes (vertex n) (vs ++ [vertex n]) (adjacents (vertex n) g) ns) g
                 inQueueNodes v ns [] xs = xs
                 inQueueNodes v ns vs xs = xs ++ (filter (\x -> (not (any (\y->x == y || v == (vertex x)) xs))) (filter (\z-> not (elem (vertex z) ns)) vs))
-
