@@ -139,7 +139,7 @@ fromNodeList1 g = foldl addNode g
 fromEdgeList :: Graph -> [Edge] -> Graph
 fromEdgeList g = foldl addEdge g
 
--- Delete a node only if it isn't connected to any node
+-- Delete a node only if it is not connected to any node
 deleteNode :: Vertex -> Graph -> Graph
 deleteNode v g
   | (existsNode v g) && not (any (\(x, y) -> x == v || y == v) (edges g)) = (deleteN v (nodes g), edges g)
@@ -170,7 +170,7 @@ putNodeElement v e g
   | otherwise = g
   where putContent u k nodes = if (vertex (head nodes)) == u then (u, k) : tail nodes else head nodes : putContent u k (tail nodes)
 
--- Read the element inside a node
+-- Read the element contained in a node
 getNodeElement :: Vertex -> Graph -> Maybe Element
 getNodeElement v g 
   | existsNode v g = Just (element (node v g))
@@ -196,14 +196,14 @@ breadthFirstSearch v g
             where inQueueNodes v ns [] xs = xs
                   inQueueNodes v ns vs xs = xs ++ (filter (\x -> (not (any (\y->x == y || v == (vertex x)) xs))) (filter (\z-> not (elem (vertex z) ns)) vs))
 
--- Verify the absence of cycles in the graph
+-- Verify the absence of cycles inside the graph
 acyclic :: Graph -> Bool
 acyclic g
-  | isEmpty g = False
+  | isEmpty g = True
   | otherwise = not (any (\x-> existsPath x x g) (vertices g))
 
--- Verify that a node u can be reach a node v directly or indirectly using adjacencies
--- Every path has a length >= 1. Self-loops are avoided.
+-- Verify that a node 'u' can reach a node 'v' directly or indirectly
+-- Every path has a length >= 1. Self-loop are not considered
 existsPath :: Vertex -> Vertex -> Graph -> Bool
 existsPath _ _ (_, []) = False
 existsPath u v g
