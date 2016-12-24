@@ -52,11 +52,11 @@ instance {-# OVERLAPS #-} Show Graph where
 instance {-# OVERLAPS #-} Show Node where
     show n = show (vertex n)
 
--- | Get the vertex of a given node
+-- Get the vertex of a given node
 vertex :: Node -> Vertex
 vertex n = fst n
 
--- | Get the element of a given node
+-- Get the element of a given node
 element :: Node -> Element
 element n = snd n
 
@@ -102,15 +102,15 @@ existsNode :: Vertex -> Graph -> Bool
 existsNode _ ([], _) = False
 existsNode v g = any (\x -> x == v) (vertices g)
 
--- Check if an edge from node u to node v exists
+-- Check if an edge between two nodes exists
 existsEdge :: Edge -> Graph -> Bool
 existsEdge (u, v) g = any (\(x, y) -> x == u  && y == v) (edges g)
 
--- Check if ther is at least one self loop inside the graph
+-- Check if there is at least one self loop inside the graph
 existsSelfLoop :: Edge -> Graph -> Bool
 existsSelfLoop (u, v) g = any (\(x, y) -> x == y) (edges g)
 
--- Add a node to the graph if its vertex doesn't exists
+-- Add a node to the graph if its vertex doesn't exist
 addNode :: Graph -> Node -> Graph
 addNode g n
   | existsNode (vertex n) g = g
@@ -146,7 +146,7 @@ deleteNode v g
   | otherwise = g
   where deleteN u xs = if (vertex (head xs)) == u then tail xs else head xs : deleteN u (tail xs)
 
--- Delete an edge if it exists
+-- Delete an edge if exists
 deleteEdge :: Edge -> Graph -> Graph
 deleteEdge (u, v) g
   | existsNode u g && existsNode v g && existsEdge(u, v) g = (nodes g, deleteA u v (edges g))
@@ -202,8 +202,7 @@ acyclic g
   | isEmpty g = True
   | otherwise = not (any (\x-> existsPath x x g) (vertices g))
 
--- Verify that a node 'u' can reach a node 'v' directly or indirectly
--- Every path has a length >= 1. Self-loop are not considered
+-- Verify that a path between two nodes exists. Self-loop are not considered
 existsPath :: Vertex -> Vertex -> Graph -> Bool
 existsPath _ _ (_, []) = False
 existsPath u v g
